@@ -9,7 +9,6 @@ members = {'Jiangnan Huang', 'Zhiwei Lin','Nan Chen', 'Ivan Hartono'};
 
 % Email-Address (from Moodle!):
 mail = {'jiangnan.huang@tum.de', 'daten.hannes@tum.de'};
-sprintf("this is only a test!");
 
 %% Setup Image Reader
 % Specify Scene Folder
