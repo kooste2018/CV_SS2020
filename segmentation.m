@@ -20,12 +20,12 @@ function [mask] = segmentation(left,right)
   %get robust correspondences
   correspondences_robust1 = F_ransac(correspondences1);
   correspondences_r obust2 = F_ransac(correspondences2);
-  %get essential matrix, K unknown, so use F
-  F1=epa(correspondences_robust1);
-  F2=epa(correspondences_robust2);
-  %get euklidean movement,this function is not implemented yet
-  [T1_1, R1_1, T2_1, R2_1, U_1, V_1] = TR_from_F(F1)
-  [T1_2, R1_2, T2_2, R2_2, U_2, V_2] = TR_from_F(F2)
+  %what is K here
+  E1=epa(correspondences_robust1,K);
+  E2=epa(correspondences_robust2,K);
+  %get euklidean movement
+  [T1_1, R1_1, T2_1, R2_1, U_1, V_1] = TR_from_E(E1)
+  [T1_2, R1_2, T2_2, R2_2, U_2, V_2] = TR_from_E(E2)
   %reconstruction, due to K this function is to be edited, and I only want
   %lambda, the function can be simplified
   [~, ~, lambda1, ~, ~] = reconstruction(T1_1, T2_1, R1_1, R2_1, correspondences_robust1,K)
