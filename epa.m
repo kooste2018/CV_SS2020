@@ -25,7 +25,7 @@ function [EF] = epa(correspondences, K)
     [u,s,v]=svd(G);
     if nargin==2
         s(3,3)=0;
-        sigma=(s(1,1)+s(2,2))/2;
+        %sigma=(s(1,1)+s(2,2))/2;
         s(1,1)=1;
         s(2,2)=1;
         EF=u*s*v';%E
