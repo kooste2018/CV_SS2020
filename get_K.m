@@ -1,4 +1,5 @@
 %the matrix K is fixed, we don't have to put it in segmentation loop
+%K changes maybe if portal changes
 function K=get_K(im1,im2,im3)
 im1=rgb_to_gray(im1);
 im2=rgb_to_gray(im2);
