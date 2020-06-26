@@ -1,4 +1,4 @@
-function [mask] = segmentation(left,right)
+function [mask] = segmentation(left,right,K)
   % Add function description here
   %
   %
