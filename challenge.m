@@ -10,7 +10,7 @@ config;
 
 while loop ~= 1
   % Get next image tensors
-    [left,right,loop]=next(ir);
+    [left,right,loop]=ir.next();
   % Generate binary mask
     mask=segmentation(left,right);
   % Render new frame
