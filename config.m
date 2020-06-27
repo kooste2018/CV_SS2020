@@ -8,7 +8,7 @@ group_number = 35;
 members = {'Jiangnan Huang', 'Zhiwei Lin','Nan Chen', 'Ivan Hartono'};
 
 % Email-Address (from Moodle!):
-mail = {'jiangnan.huang@tum.de', 'daten.hannes@tum.de'};
+mail = {'jiangnan.huang@tum.de', 'daten.hannes@tum.de', 'ivan.hartono@tum.de'};
 
 
 %% Setup Image Reader
