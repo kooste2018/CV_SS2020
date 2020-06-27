@@ -70,13 +70,13 @@ classdef ImageReader
             im_list_R = [data_R.name];
             im_list_R = cellstr(reshape((im_list_R),12,[])');
             % When will it end
-            if ir.n+ir.Start > length(Size_L) % im Ordner nicbt mehr genuegend Bilder zur Verfuegung stehen
+            if ir.n+ir.Start > Size_L % im Ordner nicbt mehr genuegend Bilder zur Verfuegung stehen
                     END_L = Size_L;
                     loop = 1;
                 else
                     END_L = ir.Start+ir.n;
             end
-            if ir.n+ir.Start > length(Size_R) % im Ordner nicbt mehr genuegend Bilder zur Verfuegung stehen
+            if ir.n+ir.Start > Size_R % im Ordner nicbt mehr genuegend Bilder zur Verfuegung stehen
                     END_R = Size_R;
                     loop = 1;
                 else
