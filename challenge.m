@@ -10,10 +10,6 @@ config;
 
 while loop ~= 1
   % Get next image tensors
-    % where is the subfolder? src = ? 
-    L = 1
-    R = 2
-    ir = ImageReader(src,L,R,0,1)
     [left,right,loop]=next(ir);
   % Generate binary mask
     mask=segmentation(left,right);
