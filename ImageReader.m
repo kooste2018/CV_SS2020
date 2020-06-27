@@ -67,6 +67,7 @@ classdef ImageReader
             Size_R = size(data_R,1); % z.B. 2292 images
             im_list_L = [data_L.name];
             im_list_L = cellstr(reshape((im_list_L),12,[])');
+            %error here, matlab cannot convert double to cellstr
             im_list_R = [data_R.name];
             im_list_R = cellstr(reshape((im_list_R),12,[])');
             % When will it end
