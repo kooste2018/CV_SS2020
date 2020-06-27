@@ -1,5 +1,5 @@
 % Update from previous version: Now this version provide output for image segmentation, but it is still not yet capable of self updating, 
-% meaning, if N=1, start=0, next(ir) will give only left and right matrices of size 600x(800*(N+1))x3 from '...0000.jpg' and '....0001.jpg'
+% meaning, if N=1, start=0, next(ir) will give only left and right matrices of size 600x800x((N+1)*3) from '...0000.jpg' and '....0001.jpg'
 
 % if '...0004.jpg' and '....0005.jpg' are needed, then use ImageReader(src,1,2,start,N) with start = 4, N =1 
 
@@ -88,7 +88,7 @@ classdef ImageReader
                 % Result: F:\CV\P1E_S1_C1\00000001.jpg
                 left_src = append(ir.l,im_list_L(counter_l+1));
                 % Determine values inside
-                left = [left imread(left_src)];
+                left = cat(3,left,imread(left_src));
                 left_value = im_list_L(counter_l+1);
                 fprintf(1, 'Left value: %s \n', left_value{:})
             end
@@ -98,7 +98,7 @@ classdef ImageReader
                 % Result: F:\CV\P1E_S1_C1\00000001.jpg
                 right_src = append(ir.r,im_list_R(counter_r+1));
                 % Determine values inside
-                right = [right imread(right_src)];
+                right = cat(3,right,imread(right_src));
                 right_value = im_list_R(counter_r+1);
                 fprintf(1, 'Right value: %s \n', right_value{:})
             end
