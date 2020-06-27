@@ -6,7 +6,7 @@ close all
 tic
 
 %% Generate Movie
-config
+config;
 
 while loop ~= 1
   % Get next image tensors

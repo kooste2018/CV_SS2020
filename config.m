@@ -10,29 +10,33 @@ members = {'Jiangnan Huang', 'Zhiwei Lin','Nan Chen', 'Ivan Hartono'};
 % Email-Address (from Moodle!):
 mail = {'jiangnan.huang@tum.de', 'daten.hannes@tum.de'};
 
+
 %% Setup Image Reader
 % Specify Scene Folder
 src = "Path/to/my/ChokePoint/P1E_S1";
 
 % Select Cameras
-L =1
-R =2
+L =1;
+R =2;
 
 % Choose a start point
-start = randi(1000)
+start = randi(1000);
 
 % Choose the number of succseeding frames
-N =1
+N =1;
 
+%get object
 ir = ImageReader(src, L, R, start, N);
 
+%set loop 
+loop=0;
 
 %% Output Settings
 % Output Path
 dst = "C:\master\learning materials\CV\challenge\output.avi";
 
 % Load Virual Background
-bg = imread("C:\master\learning materials\CV\challenge\bg1.jpg")
+bg = imread("C:\master\learning materials\CV\challenge\bg1.jpg");
 
 % Select rendering mode
 mode = "substitute";
