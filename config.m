@@ -49,5 +49,8 @@ if start == 0
     end
 end
 
+%index for movie, for loop later
+i=1;
+
 % Store Output?
 store = true;
