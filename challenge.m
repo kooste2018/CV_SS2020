@@ -16,6 +16,8 @@ while loop ~= 1
   % Render new frame
     frame=left(:,:,1:3);
     result = render(frame,mask,bg,mode);
+    movie(i)={result};
+    i=i+1;
 end
 
 %% Stop timer here
@@ -29,6 +31,8 @@ if store
     writerObj.FrameRate = 1;
     % open the video writer
     open(writerObj);
+    %clip movie, delete blank frames
+    movie=movie(1:i);
     % write the frames to the video
     for u=1:length(movie)
      % convert the image to a frame
