@@ -1,11 +1,9 @@
-% It's very hard to seperate the background and the foregound if we simply
-% compare one photo with the already existing background, no matter how we
-% change the threshold of the difference. One possible reason is that the effect of
-% light and shadow can't simply be ignored in this case. 
-% So this method is not feasible.
+% It's very easy to seperate the background and the foregound if we simply
+% compare one photo with the already existing background with a proper threshold of the difference. 
+% But some noise will remain. One possible reason is that the effect of light and shadow can't simply be ignored in this case. 
+% So this method is not feasible enough.
 
-% You can try this easy function with 2 photos to verify it. The ideal
-% output "mask" should be a black picture with only a human figure.
+% You can try this easy function with 2 photos to verify it. The ideal output "mask" should be a black background with only a white human figure.
 
 function [mask] = segmentation1(background,photo)
 background=imread(background);
