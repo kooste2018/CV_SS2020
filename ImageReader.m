@@ -49,8 +49,8 @@ classdef ImageReader
             ir.n = p.Results.N;
             % Expected Output:
             % ImageReader with properties:
-            % l: "F:\CV\P1E_S1_C1\"
-            % r: "F:\CV\P1E_S1_C2\"
+            % l: 'F:\CV\P1E_S1_C1\'
+            % r: 'F:\CV\P1E_S1_C2\'
             % Start: 3
             % n: 4
         end
@@ -61,32 +61,32 @@ classdef ImageReader
             left = [];
             right = [];
             loop = 0;
-            data_L = dir(append(ir.l,'*.jpg'));
-            data_R = dir(append(ir.r,'*.jpg'));
-            Size_L = size(data_L,1);
-            Size_R = size(data_R,1); % z.B. 2292 images
+            data_L = dir([ir.l,'*.jpg']);
+            data_R = dir([ir.r,'*.jpg']);
+            Size_L = length(data_L);
+            Size_R = length(data_R); % z.B. 2292 images
             im_list_L = [data_L.name];
             im_list_L = cellstr(reshape((im_list_L),12,[])');
             im_list_R = [data_R.name];
             im_list_R = cellstr(reshape((im_list_R),12,[])');
             % When will it end
-            if ir.n+ir.Start > Size_L % im Ordner nicbt mehr genuegend Bilder zur Verfuegung stehen
-                    END_L = Size_L;
-                    loop = 1;
-                else
-                    END_L = ir.Start+ir.n;
+            if ir.n+ir.Start > Size_L % im Ordner nicht mehr genuegend Bilder zur Verfuegung stehen
+                END_L = Size_L;
+                loop = 1;
+            else
+                END_L = ir.Start+ir.n;
             end
-            if ir.n+ir.Start > Size_R % im Ordner nicbt mehr genuegend Bilder zur Verfuegung stehen
-                    END_R = Size_R;
-                    loop = 1;
-                else
-                    END_R = ir.Start+ir.n;
+            if ir.n+ir.Start > Size_R % im Ordner nicht mehr genuegend Bilder zur Verfuegung stehen
+                END_R = Size_R;
+                loop = 1;
+            else
+                END_R = ir.Start+ir.n;
             end
             % Left Side
             for counter_l = ir.Start:END_L
                 % Write source by combining ir.l / ir.r with ir.Start 
                 % Result: F:\CV\P1E_S1_C1\00000001.jpg
-                left_src = append(ir.l,im_list_L(counter_l+1));
+                left_src = [ir.l,char(im_list_L(counter_l+1))];
                 % Determine values inside
                 left = cat(3,left,imread(left_src));
                 left_value = im_list_L(counter_l+1);
@@ -96,7 +96,7 @@ classdef ImageReader
             for counter_r = ir.Start:END_R
                 % Write source by combining ir.l / ir.r with ir.Start 
                 % Result: F:\CV\P1E_S1_C1\00000001.jpg
-                right_src = append(ir.r,im_list_R(counter_r+1));
+                right_src = [ir.r,char(im_list_R(counter_r+1))];
                 % Determine values inside
                 right = cat(3,right,imread(right_src));
                 right_value = im_list_R(counter_r+1);
