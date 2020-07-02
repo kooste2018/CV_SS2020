@@ -30,7 +30,7 @@ diff2=im2bw(diff2,t);
 diff2=imopen(diff2,se);
 diff2=imdilate(diff2,se3);  % dilate
 
-mask=diff1.*diff2;
+mask=diff1.*diff2;  % the programm below can be further improved, now it's a little complicated and the result is also not good enough
 
 mask=bwareaopen(mask,6000);  % delete small white areas
 mask=imfill(mask,'holes');
