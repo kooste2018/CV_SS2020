@@ -3,7 +3,7 @@ function [mask] = segmentation_test(left,right)
 % consecutive frames. Here one camera is enough.We use the left camera.PAY
 % ATTENTION: N must be 3.
 % 
-% evaluation: 8.1/10
+% evaluation: 8.2/10
 
 p1=left(:,:,1:3);
 p1=im2double(rgb2gray(p1));
