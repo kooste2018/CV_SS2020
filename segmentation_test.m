@@ -20,6 +20,7 @@ se4=strel('disk',40);
 se5=strel('disk',12);
 se6=strel('disk',5);
 t=0.015;  % set a threshold: the larger t is, the more pixels will be regarded as background
+
 diff1=abs(p2_gray-p1);
 diff1=im2bw(diff1,t);  % convert the gray image into 2-value image
 diff1=imopen(diff1,se);  % open image operation: first dilate, then erode
