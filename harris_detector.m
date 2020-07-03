@@ -112,7 +112,7 @@ function features = harris_detector(input_image, varargin)
                 %coordinate (x,y) based on corners wo border
                 row_max=sort_temp(1,1)+(j-1)*tile_size(1);
                 col_max=sort_temp(1,2)+(i-1)*tile_size(2);
-                features(features_index)=[col_max;row_max];
+                features(:,features_index)=[col_max;row_max];
                 features_index=features_index+1;
                 %set tile 0 with min_dist, use cake to set 0 in corners,to
                 %influent corners_wo_border, and change the next tile.
@@ -139,5 +139,5 @@ function features = harris_detector(input_image, varargin)
             end
         end
     end
-    features=features(1:features_index);%delete useless 0
+    features=features(:,1:features_index-1);%delete useless 0
 end
