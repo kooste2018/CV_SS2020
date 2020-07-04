@@ -49,8 +49,8 @@ classdef ImageReader
             ir.n = p.Results.N;
             % Expected Output:
             % ImageReader with properties:
-            % l: 'F:\CV\P1E_S1_C1\'
-            % r: 'F:\CV\P1E_S1_C2\'
+            % l: "F:\CV\P1E_S1_C1\"
+            % r: "F:\CV\P1E_S1_C2\"
             % Start: 3
             % n: 4
         end
