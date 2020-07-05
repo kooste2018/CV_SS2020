@@ -1,95 +1,65 @@
-% Update from previous version: Now this version provide output for image segmentation, but it is still not yet capable of self updating, 
-% meaning, if N=1, start=0, next(ir) will give only left and right matrices of size 600x800x((N+1)*3) from '...0000.jpg' and '....0001.jpg'
-
-% if '...0004.jpg' and '....0005.jpg' are needed, then use ImageReader(src,1,2,start,N) with start = 4, N =1 
-
-% Future update will fix this issue, but this should at least provide output for further processing
-
-% To use:
-% 1. src = 'F:\CV\P1E_S1' or own local folder location with this format
-% (format from challenge PDF)
-% 2. ir = ImageReader(src,1,2,0,1)
-% 3. [left,right,loop]=next(ir);
 classdef ImageReader
-  % Define properties needed to process two of the three video streams from a scene folder and play endless loop
     properties  
-        l               % L         Linkes Bild, die Werte{1,2}
-        r               % R         Rechtes Bild, die Werte{2,3}
-        Start = 0;      % start     Anfangsnummer für Lesevorgang
-        n = 1;          % N         Endnummer für Lesevorgang
-        Loop = 0;       % Loop
+        l%path of folder, camera left
+        r%path of folder, camera right 
+        start=0%0 means actually the fist image
+        N=1%number of followers
+        loop=0%loop flag
+        allimage_left%struct, saving information of all images of folder camera left
+        allimage_right%struct, saving information of all images of folder camera right
     end
-    % How do we do this shit
+    
     methods
-        % Image Reader 
-        % src standard input: 'F:\CV\P1E_S1'
         function ir = ImageReader(src, L, R, varargin)     
             if (L==R)
-                fprintf('L and R must be different!\n');
-                L = 3;
-            end
-            % Validation requirement
-            L_validation = @(x) isnumeric(x) && (x==1) || (x==2);
-            R_validation = @(x) isnumeric(x) && (x==3) || (x==2);
-            start_validation = @(x) isnumeric(x);
-            N_validation = @(x) isnumeric(x);
+                error('L and R must be different!\n');
+            else
             % Input Parser
             p=inputParser;
-            % Dateipfad zu Szenenordner
             p.addRequired('src');
-            p.addRequired('L',L_validation);
-            p.addRequired('R',R_validation);
-            p.addOptional('start',ir.Start,start_validation);
-            p.addOptional('N',ir.n,N_validation);
+            p.addRequired('L',@(x) isnumeric(x) && (x==1) || (x==2));
+            p.addRequired('R',@(x) isnumeric(x) && (x==3) || (x==2));
+            p.addOptional('start',ir.start,@(x) isnumeric(x));
+            p.addOptional('N',ir.N, @(x) isnumeric(x));
             p.parse(src, L, R, varargin{:});
-            % Input into data
-            ir.l = strcat(src,'_C',string(p.Results.L),'\'); % Standard l input _C1 -> "..."
-            ir.r = strcat(src,'_C',string(p.Results.R),'\'); % Standard r input _C3 -> "..."
-            ir.Start = p.Results.start;
-            ir.n = p.Results.N;
-            % Expected Output:
-            % ImageReader with properties:
-            % l: "F:\CV\P1E_S1_C1\"
-            % r: "F:\CV\P1E_S1_C2\"
-            % Start: 3
-            % n: 4
+            % update properties of this object ir 
+            %check path if something strange happens!
+            ir.l = strcat(src,src(end-6:end-1),'_C',string(p.Results.L),'\'); 
+            ir.r = strcat(src,src(end-6:end-1),'_C',string(p.Results.R),'\');
+            ir.start = p.Results.start;
+            ir.start=max(ir.start,1);%0 means index 1 by me, so set start min 1
+            ir.N = p.Results.N;
+            ir.allimage_left=dir(strcat(ir.l,"*.jpg"));%read all images for next()
+            ir.allimage_right=dir(strcat(ir.r,"*.jpg"));
+            end
         end
-    end
-    methods
-        % Laden von Bildern
+
         function [left, right, loop] = next(ir)
-            left = [];
-            right = [];
-            loop = 0;
-            data_L = dir(strcat(ir.l,'*.jpg'));
-            data_R = dir(strcat(ir.r,'*.jpg'));
-            Size_L = length(data_L);  % Size_R = length(data_R); Size_R = Size_L;
-            Size = Size_L; % z.B. 2292 images
-            im_list_L = [data_L.name];
-            im_list_L = cellstr(reshape((im_list_L),12,[])');
-            im_list_R = [data_R.name];
-            im_list_R = cellstr(reshape((im_list_R),12,[])');
-            % When will it end
-            if ir.n+ir.Start > Size % im Ordner nicht mehr genuegend Bilder zur Verfuegung stehen
-                END = Size;
-                loop = 1;
-            else
-                END = ir.Start+ir.n;
+            persistent index;%define and init persistent index, otherwise value lost
+            if isempty(index)
+                index=ir.start;
             end
-            % Left & right
-            for counter = ir.Start:END
-                % Write source by combining ir.l / ir.r with ir.Start 
-                % Result: F:\CV\P1E_S1_C1\00000001.jpg
-                left_src = strcat(ir.l,char(im_list_L(counter_l+1)));
-                right_src = strcat(ir.r,char(im_list_R(counter_r+1)));
-                % Determine values inside
-                left = cat(3,left,imread(left_src));
-                left_value = im_list_L(counter_l+1);
-                fprintf(1, 'Left value: %s \n', left_value{:})
-                right = cat(3,right,imread(right_src));
-                right_value = im_list_R(counter_r+1);
-                fprintf(1, 'Right value: %s \n', right_value{:})
+            left = zeros(600,800,3*(ir.N+1));
+            right = left;%initialize left and right for speeding up
+            if index+ir.N<numel(ir.allimage_left)%if not reach the end
+                for i=1:ir.N+1
+                    left(:,:,3*i-2:3*i)=im2double(imread(strcat(ir.l,ir.allimage_left(index).name)));
+                    right(:,:,3*i-2:3*i)=im2double(imread(strcat(ir.r,ir.allimage_right(index).name)));
+                    index=index+1;%update index
+                end
+            else%reach the end, set loop, and set start to begin
+                num_rest=numel(ir.allimage_left)-index+1;
+                left = zeros(600,800,3*num_rest);%redefine dimension
+                right = left;
+                for i=1:num_rest%all rest image together, less than N+1
+                    left(:,:,3*i-2:3*i)=im2double(imread(strcat(ir.l,ir.allimage_left(index).name)));
+                    right(:,:,3*i-2:3*i)=im2double(imread(strcat(ir.r,ir.allimage_right(index).name)));
+                    index=index+1;%update index
+                end
+                ir.loop=1;%set loop
+                index=1;%reset to beginning
             end
+            loop = ir.loop;%pass loop to output
         end
     end
 end

@@ -1,4 +1,4 @@
-function [mask] = segmentation(left,right)
+function [mask] = segmentation_test(left,right)
 % 3-frame-method: a good way to get the contour of a moving object with 3
 % consecutive frames. Here one camera is enough.We use the left camera.PAY
 % ATTENTION: N must be 3.
@@ -43,8 +43,8 @@ mask=imerode(mask,se5);
 mask=imfill(mask,'holes');
 mask=medfilt2(mask,[20 ,20]);  % median filtering
 
-figure('NumberTitle', 'off', 'Name', 'final mask');imshow(mask);
-
-figure;imshow(mask.*p2);
+% figure('NumberTitle', 'off', 'Name', 'final mask');imshow(mask);
+% 
+% figure;imshow(mask.*p2);
 
 end
