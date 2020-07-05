@@ -62,7 +62,6 @@ classdef ImageReader
             right = [];
             loop = 0;
             data_L = dir(strcat(ir.l,'*.jpg'));
-            %%here I have error. check help site of dir. You want to list all jpg files but you may first enter the pfad by cd.
             data_R = dir(strcat(ir.r,'*.jpg'));
             Size_L = length(data_L);  % Size_R = length(data_R); Size_R = Size_L;
             Size = Size_L; % z.B. 2292 images
@@ -81,8 +80,8 @@ classdef ImageReader
             for counter = ir.Start:END
                 % Write source by combining ir.l / ir.r with ir.Start 
                 % Result: F:\CV\P1E_S1_C1\00000001.jpg
-                left_src = strcat(ir.l,char(im_list_L(counter_l+1));
-                right_src = strcat(ir.r,char(im_list_R(counter_r+1));
+                left_src = strcat(ir.l,char(im_list_L(counter_l+1)));
+                right_src = strcat(ir.r,char(im_list_R(counter_r+1)));
                 % Determine values inside
                 left = cat(3,left,imread(left_src));
                 left_value = im_list_L(counter_l+1);
