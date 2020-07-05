@@ -8,7 +8,7 @@ group_number = 35;
 members = {'Jiangnan Huang', 'Zhiwei Lin','Nan Chen', 'Ivan Hartono'};
 
 % Email-Address (from Moodle!):
-mail = {'jiangnan.huang@tum.de', 'daten.hannes@tum.de', 'ivan.hartono@tum.de'};
+mail = {'jiangnan.huang@tum.de', 'ge37rer@mytum.de', 'ivan.hartono@tum.de','n.chen@tum.de'};
 
 
 %% Setup Image Reader
@@ -42,12 +42,7 @@ bg = imread("C:\master\learning materials\CV\challenge\bg1.jpg");
 mode = "substitute";
 
 % Create a movie array
-movie=cell(1,1000);
-if start == 0
-    for i=1:1000
-        movie{i}=0;
-    end
-end
+movie=cell(1,5000);
 
 %index for movie, for loop later
 i=1;
