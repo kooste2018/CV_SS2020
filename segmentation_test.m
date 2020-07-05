@@ -1,4 +1,4 @@
-function [mask] = segmentation_test(left,right)
+function [mask] = segmentation(left,right)
 % 3-frame-method: a good way to get the contour of a moving object with 3
 % consecutive frames. Here one camera is enough.We use the left camera.PAY
 % ATTENTION: N must be 3.
