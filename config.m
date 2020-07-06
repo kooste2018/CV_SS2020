@@ -13,7 +13,7 @@ mail = {'jiangnan.huang@tum.de', 'zhiwei.lin@tum.de','nan.chen@tum.de','hartono.
 
 %% Setup Image Reader
 % Specify Scene Folder
-src = 'C:\master\learning materials\CV\challenge\originalfiles\P1E_S1\';
+src = 'C:\master\learning materials\CV\challenge\originalfiles\P1E_S1';
 
 % Select Cameras
 L =1;
