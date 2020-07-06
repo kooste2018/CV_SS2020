@@ -13,7 +13,15 @@ mail = {'jiangnan.huang@tum.de', 'zhiwei.lin@tum.de','nan.chen@tum.de','hartono.
 
 %% Setup Image Reader
 % Specify Scene Folder
-src = 'C:\master\learning materials\CV\challenge\originalfiles\P1E_S1';
+if ispc
+    src = strcat(pwd,'\originalfiles\P1E_S1');
+else
+    if ismac||isunix
+        src = strcat(pwd,'/originalfiles/P1E_S1');
+    else
+        error("System not supported!\n");
+    end
+end
 
 % Select Cameras
 L =1;
@@ -34,7 +42,15 @@ loop=0;
 
 %% Output Settings
 % Output Path
-dst = "C:\master\learning materials\CV\challenge\output.avi";
+if ispc
+    dst = strcat(pwd,'\output.avi');
+else
+    if ismac||isunix
+        dst = strcat(pwd,'/output.avi');
+    else
+        error("System not supported!\n");
+    end
+end
 
 % Load Virual Background
 bg = im2double(imread("C:\master\learning materials\CV\challenge\bg1.jpg"));
