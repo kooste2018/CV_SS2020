@@ -24,8 +24,18 @@ classdef ImageReader
             p.parse(src, L, R, varargin{:});
             % update properties of this object ir 
             %check path if something strange happens!
-            ir.l = strcat(src,src(end-6:end-1),'_C',string(p.Results.L),'\'); 
-            ir.r = strcat(src,src(end-6:end-1),'_C',string(p.Results.R),'\');
+            %check system
+            if ispc
+                ir.l = strcat(src,'\',src(end-5:end),'_C',string(p.Results.L)); 
+                ir.r = strcat(src,'\',src(end-5:end),'_C',string(p.Results.R));
+            else
+                if ismac||isunix
+                    ir.l = strcat(src,'/',src(end-5:end),'_C',string(p.Results.L)); 
+                    ir.r = strcat(src,'/',src(end-5:end),'_C',string(p.Results.R));
+                else
+                    error("System not supported!\n");
+                end
+            end
             ir.start = p.Results.start;
             ir.start=max(ir.start,1);%0 means index 1 by me, so set start min 1
             ir.N = p.Results.N;
