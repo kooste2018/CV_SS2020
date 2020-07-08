@@ -26,12 +26,12 @@ classdef ImageReader
             %check path if something strange happens!
             %check system
             if ispc
-                ir.l = strcat(src,'\',src(end-5:end),'_C',string(p.Results.L)); 
-                ir.r = strcat(src,'\',src(end-5:end),'_C',string(p.Results.R));
+                ir.l = strcat(src,'\',src(end-5:end),'_C',string(p.Results.L),'\'); 
+                ir.r = strcat(src,'\',src(end-5:end),'_C',string(p.Results.R),'\');
             else
                 if ismac||isunix
-                    ir.l = strcat(src,'/',src(end-5:end),'_C',string(p.Results.L)); 
-                    ir.r = strcat(src,'/',src(end-5:end),'_C',string(p.Results.R));
+                    ir.l = strcat(src,'/',src(end-5:end),'_C',string(p.Results.L),'/'); 
+                    ir.r = strcat(src,'/',src(end-5:end),'_C',string(p.Results.R),'/');
                 else
                     error("System not supported!\n");
                 end
