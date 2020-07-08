@@ -1,12 +1,12 @@
 %% Computer Vision Challenge 2020 challenge.m
-clear
-clc
-close all
 %% Start timer here
 tic
 
 %% Generate Movie
-config;
+%load default value, if gui passes new one, this should not be executed.
+if exist('ir')==0 %pick one variable in config to check if workspace empty, one is enough
+  config;
+end
 
 while loop ~= 1
   % Get next image tensors
