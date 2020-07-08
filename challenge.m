@@ -20,6 +20,10 @@ while loop ~= 1
     %error, memory error and so on
     movie(i)={result};
     i=i+1;
+    if i==5000
+      i=1;
+      movie_flag=1;%if GUI set loop mode, movie will be full filled and totally exported.
+    end 
 end
 
 %% Stop timer here
@@ -33,7 +37,11 @@ if store
     % open the video writer
     open(writerObj);
     %clip movie, delete blank frames
-    movie=movie(1:i-1);
+    if movie_flag==0
+      movie=movie(1:i-1);
+    else 
+      movie_flag=0;%reset it for next
+    end
     % write the frames to the video
     for u=1:length(movie)
      % convert the image to a frame
