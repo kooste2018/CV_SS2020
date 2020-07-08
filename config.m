@@ -29,7 +29,6 @@ R =2;
 
 % Choose a start point
 start = randi(1000);
-start=291;
 
 % Choose the number of succseeding frames
 N =2;
@@ -54,10 +53,10 @@ end
 
 % Load Virual Background
 if ispc
-    bgpath = strcat(pwd,'\bg\bg1');
+    bgpath = strcat(pwd,'\bg\bg1.jpg');
 else
     if ismac||isunix
-        bgpath = strcat(pwd,'/bg/bg1');
+        bgpath = strcat(pwd,'/bg/bg1.jpg');
     else
         error("System not supported!\n");
     end
