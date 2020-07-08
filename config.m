@@ -53,13 +53,23 @@ else
 end
 
 % Load Virual Background
-bg = im2double(imread("C:\master\learning materials\CV\challenge\bg1.jpg"));
+if ispc
+    bgpath = strcat(pwd,'\bg\bg1');
+else
+    if ismac||isunix
+        bgpath = strcat(pwd,'/bg/bg1');
+    else
+        error("System not supported!\n");
+    end
+end
+bg = im2double(imread(bgpath));
 
 % Select rendering mode
 mode = "substitute";
 
 % Create a movie array
 movie=cell(1,5000);
+movie_flag=0;
 
 %index for movie, for loop later
 i=1;
