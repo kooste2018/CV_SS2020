@@ -1,50 +1,48 @@
-function [mask] = segmentation_test(left,right)
+function [mask] = segmentation(left,right)
 % 3-frame-method: a good way to get the contour of a moving object with 3
 % consecutive frames. Here one camera is enough.We use the left camera.PAY
-% ATTENTION: N must be 3.
+% ATTENTION: N must be 4.
 % 
-% evaluation: 8.2/10
+% evaluation: 8.3/10
 
+% read and preprocess the images
 p1=left(:,:,1:3);
 p1=im2double(rgb2gray(p1));
-p2=left(:,:,4:6);
-p2=im2double(p2);
-p2_gray=im2double(rgb2gray(p2));
-p3=left(:,:,7:9);
+p2=left(:,:,7:9);
+p2=im2double(rgb2gray(p2));
+p3=left(:,:,13:15);
 p3=im2double(rgb2gray(p3));
 
-se=strel('disk',1);
-se2=strel('disk',6);
-se3=strel('disk',3);
-se4=strel('disk',40);
-se5=strel('disk',12);
-se6=strel('disk',5);
-t=0.015;  % set a threshold: the larger t is, the more pixels will be regarded as background
+% set the main parameters of the algorithm
+t1=0.028;  % Set a threshold to detect the changing pixels. The smaller t1 is, the more pixels will be detected as moving.
+se1=strel('disk',1);
+se2=strel('disk',8);
+se3=strel('disk',5);
+se4=strel('disk',5);
+se5=strel('disk',11);
 
-diff1=abs(p2_gray-p1);
-diff1=im2bw(diff1,t);  % convert the gray image into 2-value image
-diff1=imopen(diff1,se);  % open image operation: first dilate, then erode
-diff1=imdilate(diff1,se3);  % dilate
-diff2=abs(p2_gray-p3);
-diff2=im2bw(diff2,t);
-diff2=imopen(diff2,se);
-diff2=imdilate(diff2,se3);  % dilate
+% 3-frame-method
+diff1=abs(p1-p2);
+diff1=im2bw(diff1,t1);  % convert the gray image into 2-value image
+diff1=imopen(diff1,se1);  % open operation,delete small white noises
+diff2=abs(p2-p3);
+diff2=im2bw(diff2,t1);
+diff2=imopen(diff2,se1);
 
-mask=diff1.*diff2;  % the programm below can be further improved, now it's a little complicated and the result is also not good enough
+% get the  raw contour of the foreground of p2
+mask=diff1.*diff2; 
 
-mask=bwareaopen(mask,6000);  % delete small white areas
-mask=imfill(mask,'holes');
-mask=imopen(mask,se2);
-mask=imdilate(mask,se6);  % dilate
-mask=imfill(mask,'holes');   % fill the surrounded black areas
-mask=bwareaopen(mask,800);  % delete small white areas
-mask=imclose(mask,se4);
-mask=imerode(mask,se5); 
-mask=imfill(mask,'holes');
-mask=medfilt2(mask,[20 ,20]);  % median filtering
-
-% figure('NumberTitle', 'off', 'Name', 'final mask');imshow(mask);
-% 
-% figure;imshow(mask.*p2);
+% improve the mask with morphology
+mask=imdilate(mask,se2);  % dilate to fill black areas as much as possible 
+mask=imopen(mask,se3);  % again delete white noises, especially belonging to the background
+mask=bwareaopen(mask,3000);  % delete small white areas
+mask=[mask;true(1,size(mask,2))]; % process boundary
+mask=imfill(mask,'holes');  % fill the surrounded black areas
+mask=mask(1:end-1,:);
+mask=imdilate(mask,se4);  % dilate
+mask=imfill(mask,'holes');  % fill the surrounded black areas
+mask=imerode(mask,se5);  % erode to approach the contour of the man
+mask=medfilt2(mask,[50 ,50]);  % median filtering to get a smooth contour of the final mask
+mask=bwareaopen(mask,1000);  % delete small white areas
 
 end
