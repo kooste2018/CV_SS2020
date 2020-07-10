@@ -13,46 +13,47 @@ mail = {'jiangnan.huang@tum.de', 'zhiwei.lin@tum.de','nan.chen@tum.de','hartono.
 
 %% Setup Image Reader
 % Specify Scene Folder
-if ispc
+if ispc%if it's windows
     src = strcat(pwd,'\originalfiles\P1E_S1');
 else
-    if ismac||isunix
+    if ismac||isunix%if it's mac or unix
         src = strcat(pwd,'/originalfiles/P1E_S1');
     else
-        error("System not supported!\n");
+        error("System not supported!\n");%error 
     end
 end
 
 % Select Cameras
-L =1;
+L =1;%set index of folder, camera left and right
 R =2;
 
 % Choose a start point
-start = randi(1000);
+start = randi(1000);%pick start index, randomly from 1 to 1000
 
 % Choose the number of succseeding frames
-N =2;
+N =4;%set number of following images
 
 %get object
-ir = ImageReader(src, L, R, start, N);
+ir = ImageReader(src, L, R, start, N);%initialize object of class ImageReader
 
 %set loop 
 loop=0;
 
 %% Output Settings
 % Output Path
-if ispc
-    dst = strcat(pwd,'\output.avi');
+%check system
+if ispc%system recognition again for path 
+    dest = strcat(pwd,'\','output.avi');
 else
     if ismac||isunix
-        dst = strcat(pwd,'/output.avi');
+        dest = strcat(pwd,'/','output.avi');
     else
         error("System not supported!\n");
     end
 end
 
-% Load Virual Background
-if ispc
+% Load Virtual Background
+if ispc%all virtual background will be saved in bg folder, which is in the same directory of this config.m
     bgpath = strcat(pwd,'\bg\bg1.jpg');
 else
     if ismac||isunix
@@ -61,14 +62,14 @@ else
         error("System not supported!\n");
     end
 end
-bg = im2double(imread(bgpath));
+bg = im2double(imread(bgpath));%get virtual background
 
 % Select rendering mode
-mode = "substitute";
+mode = "foreground";
 
 % Create a movie array
 movie=cell(1,5000);
-movie_flag=0;
+movie_flag=0;%if movie is full, set flag 1
 
 %index for movie, for loop later
 i=1;
