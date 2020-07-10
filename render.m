@@ -8,18 +8,18 @@ function [result] = render(frame,mask,bg,mode)
   %              overlay: colored, transparent, overlayed
   %              substitute: set background as virtual bg
 
-  fg_here(:,:,1:3)=frame(:,:,1:3).*mask;  %if mask is MxN, use it 3 times for RGB
-  bg_here(:,:,1:3)=frame(:,:,1:3).*(abs(mask-1));
-  bg_virtual(:,:,1:3)=bg(:,:,1:3).*(abs(mask-1));
-  result=zeros(size(frame));
+  fg_here(:,:,1:3)=frame(:,:,1:3).*mask; %apply mask to get foreground 
+  bg_here(:,:,1:3)=frame(:,:,1:3).*(abs(mask-1)); %apply mask to get background 
+  bg_virtual(:,:,1:3)=bg(:,:,1:3).*(abs(mask-1));%get virtual background from image
+  result=zeros(size(frame));%predefine result 
   
-  switch mode
+  switch render_mode
       case 'foreground'
           result=fg_here;%the rest is already 0, i.e. black
       case 'background'
-          result=bg_here;
+          result=bg_here;%the rest is already 0, i.e. black
       case 'overlay'
-          ph_overlay=zeros(size(frame));
+          ph_overlay=zeros(size(frame));%both will be showed, transparently colored
           [ind_0]=find(mask==0);
           [ind_1]=find(mask==1);
           rgb1=[0 0.7 0.9];  % the background is blue
@@ -32,8 +32,8 @@ function [result] = render(frame,mask,bg,mode)
           end
           result=ph_overlay;
       case 'substitute'
-          result=fg_here+bg_virtual;
+          result=fg_here+bg_virtual;%apply virtual background 
       otherwise
-          warning('Unexpected mode. Black image exported.')
+          warning('Unexpected mode. Black image exported.')%error message
   end
 end
