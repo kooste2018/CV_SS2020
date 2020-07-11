@@ -129,7 +129,9 @@ function bg_location_Callback(hObject, eventdata, handles)
     % Show folder path taken
     set(handles.BG_path_name, 'string', bgpath_true);
     % assign bg
-    assignin('base','bg',im2double(imread(bgpath_true)));
+    bg = im2double(imread(bgpath_true));
+    bg = imresize(bg,[600,800]);
+    assignin('base','bg',bg);
         
 % --- Executes on selection change in Left_Image.
 function Left_Image_Callback(hObject, ~, handles)
@@ -190,19 +192,29 @@ function Start_btn_Callback(hObject, eventdata, handles)
     end
     % Define src variable by combining folder path with chosen portal,
     % entry method, and scene
-    assignin('base','src',used_Data);
+    assignin('base','src',convertStringsToChars(used_Data));
     set(handles.Used_Data_Points, 'string', used_Data);
     % get pinned value StartPoint from base workspace
-    start = evalin('base','start');
-    loop = handles.Loop_check.Value;
-    src = evalin('base','src');
+    dest = evalin('base','dest');
     L = evalin('base','L');
     R = evalin('base','R');
     N = evalin('base','N');
-    %index for movie, for loop later
+    if N<4
+        N=4;
+    end
+    mode = evalin('base','mode');
+    start = evalin('base','start');
+    src = evalin('base','src');
+    store = evalin('base','store');
+    bg = evalin('base','bg');
+    Loop_check = evalin('base','Loop_check');
+    %index for movie, and loop
     i = 1;
+    loop = 0;
     % Create a movie array
-    movie=cell(1,5000);
+    movie = cell(1,5000);
+    % if movie is full, set movie_flag 1
+    movie_flag = 0; 
     % From this part start processing using challenge.m algorithm
     % Image Reading part
     ir = ImageReader(src, L, R, start, N);
@@ -210,69 +222,80 @@ function Start_btn_Callback(hObject, eventdata, handles)
     % Get next image tensors
         [left,right,loop]=next(ir);
     % Generate binary mask
-        mask=segmentation(left,right);
-    % Render new frame
-        frame=left(:,:,1:3);
-        result = im2uint8(render(frame,mask,bg,mode));
-        %double not work due to precision error, memory error and so on
-        movie(i)={result};
-        i=i+1;
+        if loop~=1
+            mask=segmentation(left,right);
+            frame=left(:,:,7:9);          
+            % Render new frame
+            result = im2uint8(render(frame,mask,bg,mode)); %double not work due to precision error, memory error and so on, so convert it to uint8
+            movie{i}=result;  %save current processed image to movie cell array
+            i=i+1;
+        else
+            frame=left(:,:,1:3);
+            result = im2uint8(render(frame,mask,bg,mode));
+            movie{i}=result;  % movie is a cell
+        end
+        drawnow
+        stop_btn = get(handles.Stop_btn, 'userdata');
+        %%if gui loop set loop here 0 or Stop button if pressed will stop loop
+        if Loop_check && ~stop_btn
+            loop = 0;
+        else
+            loop = 1;
+        end
+        if i==5000 %if movie is full, new image will overwrite from beginning  
+            i=1;
+            movie_flag=1;%if GUI set loop mode, movie will be full filled and totally exported.
+        end 
     end
  %% Write Movie to Disk
-    if evalin('base','store') 
-        writerObj = VideoWriter(dst,'Motion JPEG AVI');
-        % create the video writer with 1 fps
-        writerObj.FrameRate = 5;
+    if store
+        VideoObj = VideoWriter(dest,'Motion JPEG AVI');  % VideoWriter is an object to write files, dst is file name, 'Motion JPEG AVI' is file type
+        % create the video writer with 5 fps, the default value is 30
+        VideoObj.FrameRate = 5;
         % open the video writer
-        open(writerObj);
+        open(VideoObj);
         %clip movie, delete blank frames
-        movie=movie(1:i-1);
+        if movie_flag == 0 %if movie is full, export all as video, if not, delete blank part 
+            movie = movie(1:i-1);
+        else 
+            movie_flag = 0;%reset it for next
+        end
         % write the frames to the video
-        for u=1:length(movie)
-            % convert the image to a frame
+        for u=1:length(movie)     
+        % convert the image to a frame
             frame = im2frame(movie{u});
-            writeVideo(writerObj, frame);
+            writeVideo(VideoObj, frame);
         end
         % close the writer object
-        close(writerObj);
-    end   
-    % generate loop starting from Startpoint ending in Succeed_Frame
-    while i< evalin('base','N')+i
-        % update loop
-        i=i+1;
-        % write loop number
-        message = sprintf('i = %d', i);
-        set(handles.output_val, 'string', message);
-        % add pause for easier observation
-        pause(0.1);
-        % update figures and updates (including i value written on message)
-        drawnow
-        % Stop button if pressed will stop loop
-        if get(handles.Stop_btn, 'userdata')
-            break;
+        close(VideoObj);
+        % obj = VideoReader('E:\Download\CV_2020_G35-master\CV_2020_G35-master\output.avi');%path of video
+        obj = VideoReader(dest);
+        numFrames = obj.NumFrames;% number of frames
+        for i = 1 : numFrames	
+            frame = read(obj,i);%read the current frame
+            axes(handles.Image_Show)
+            imshow(frame);%show frame
         end
-        % If Loop Check is activated, start non-terminating loop 
-        if i == evalin('base','N')&& handles.Loop_check.Value
-            i = 1;
+    else
+        if movie_flag == 0 %if movie is full, export all as video, if not, delete blank part 
+            movie = movie(1:i-1);
+        else 
+            movie_flag = 0;%reset it for next
         end
-    end
-    
-    obj = VideoReader('E:\Download\CV_2020_G35-master\CV_2020_G35-master\output.avi');%path of video
-    % obj = VideoReader(dst)
-    numFrames = obj.NumFrames;% number of frames
-	for i = 1 : numFrames	
-        frame = read(obj,i);%read the current frame
-        axes(handles.Image_Show)
-        imshow(frame);%show frame
-        %imwrite(frame,strcat('D:\Project\Pictures\',num2str(i),'.jpg'),'jpg');%save the frames
+        % write the frames to the video
+        for u=1:length(movie)     
+        % convert the image to a frame
+            axes(handles.Image_Show)
+            imshow(movie{u});%show frame
+        end
     end
     % turn all button on again
     set([handles.Main_Working_Folder,handles.bg_location,handles.Save_btn, handles.Portal, handles.E_L, handles.Szene],'enable','on');
     set([handles.Left_Image, handles.Right_Image, handles.Start_Point, handles.is_save, handles.Succeed_Frames],'enable','on');
     set([handles.Foreground,handles.Background,handles.Substitute,handles.Overlay, handles.Loop_check],'enable','on');
     % if data is saved
-    if handles.is_save.Value
-       save_message = sprintf('save successful');
+    if store
+        save_message = sprintf('save successful');
     else
         save_message = sprintf('Data not saved');
     end
@@ -284,6 +307,11 @@ function Stop_btn_Callback(~, ~, handles)
 
 % --- Executes on button press in Loop_check.
 function Loop_check_Callback(hObject, eventdata, handles)
+    if handles.Loop_check.Value
+        assignin('base','Loop_check',1);
+    else
+        assignin('base','Loop_check',0);
+    end
 
 % --- Executes on button press in is_save.
 function is_save_Callback(hObject, eventdata, handles)
@@ -303,11 +331,11 @@ function Save_btn_Callback(~, ~, ~)
     fprintf(a,'Choose Save Location');
     fclose('all');
     if ispc||ismac||isunix
-        dst = strcat(pathname,'output.avi');
+        dest = strcat(pathname,'output.avi');
     else
         error("System not supported!\n");
     end
-    assignin('base','dst',dst);
+    assignin('base','dest',dest);
     
 
 % --------------- Choose Rendering Mode ----------------------- %
@@ -317,16 +345,12 @@ function Rendering_Mode_SelectionChangedFcn(~, eventdata, handles)
     switch(get(eventdata.NewValue,'Tag'))
         case 'Foreground'
             render_mode = get(handles.Foreground,'string');
-            set(handles.bg_location,'enable','on');
         case 'Background'
             render_mode = get(handles.Background,'string');
-            set(handles.bg_location,'enable','on');
         case 'Overlay'
             render_mode = get(handles.Overlay,'string');
-            set(handles.bg_location,'enable','on');
         case 'Substitute'
             render_mode = get(handles.Substitute,'string');
-            set(handles.bg_location,'enable','off');
     end
     % Pin value on base workspace
     assignin('base','mode',render_mode);
