@@ -5,6 +5,7 @@ function [mask] = segmentation(left,right)
 % 
 % evaluation: 8.3/10
 
+
 % read and preprocess the images
 p1=left(:,:,1:3);
 p1=im2double(rgb2gray(p1));
