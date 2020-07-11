@@ -23,6 +23,7 @@ classdef ImageReader
             p.addOptional('N',ir.N, @(x) isnumeric(x));
             p.parse(src, L, R, varargin{:});
             
+            
             % update properties of this object ir 
             % check path if something strange happens!
             %check system, update full path correctly
