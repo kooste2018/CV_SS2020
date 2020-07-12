@@ -9,7 +9,7 @@ group_number = 35;
 members = {'Jiangnan Huang', 'Zhiwei Liang','Nan Chen', 'Ivan Hartono'};
 
 % Email-Address (from Moodle!):
-mail = {'jiangnan.huang@tum.de', 'zhiwei.liang@tum.de','nan.chen@tum.de','hartono.ivan@tum.de'};
+mail = {'jiangnan.huang@tum.de', 'zhiwei.liang@tum.de','nan.chen@tum.de','ivan.hartono@tum.de'};
 
 %% Setup Image Reader
 % Specify Scene Folder
@@ -43,10 +43,10 @@ loop=0;
 % Output Path
 %check system
 if ispc %system recognition again for path 
-    dst = strcat(pwd,'\output.avi');
+    dest = strcat(pwd,'\output.avi');
 else
     if ismac||isunix
-        dst = strcat(pwd,'/output.avi');
+        dest = strcat(pwd,'/output.avi');
     else
         error("System not supported!\n");
     end
@@ -68,7 +68,7 @@ bg = im2double(imread(bgpath));
 bg=imresize(bg,[600,800]); % adapt the bg to the size of 600*800*3, since the original virtual background can be of random size
         
 % Select rendering mode
-mode = "substitute";
+render_mode = "substitute";
 
 % Create a movie array
 movie=cell(1,5000);
