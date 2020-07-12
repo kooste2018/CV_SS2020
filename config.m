@@ -28,8 +28,7 @@ L =2; %set index of folder, camera left and right
 R =3; 
 
 % Choose a start point
-start = randi(1000);  % return randomly a value between 0 and 1000
-start=1500;
+start = 1500;
 
 % Choose the number of succseeding frames
 N =4; %set number of following images
@@ -55,10 +54,10 @@ end
 
 % Load Virtual Background
 if ispc %all virtual background will be saved in bg folder, which is in the same directory of this config.m
-    bgpath = strcat(pwd,'\bg\bg2.png');
+    bgpath = strcat(pwd,'\bg\bg2.jpg');
 else
     if ismac||isunix
-        bgpath = strcat(pwd,'/bg/bg2.png');
+        bgpath = strcat(pwd,'/bg/bg2.jpg');
     else
         error("System not supported!\n");
     end

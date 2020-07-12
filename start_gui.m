@@ -4,7 +4,7 @@
 
 % Initialization of GUI, DO NOT EDIT THIS PART
 function varargout = start_gui(varargin)
-% Last Modified by GUIDE v2.5 10-Jul-2020 09:55:47
+% Last Modified by GUIDE v2.5 12-Jul-2020 07:58:04
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
@@ -76,6 +76,12 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
+% --- Executes during object creation, after setting all properties.
+function Left_Right_CreateFcn(hObject, eventdata, handles)
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
 % -------------------------------------------------------------------- %
 % ----------------------------CALLBACKS------------------------------- %
 % -------------------------------------------------------------------- %
@@ -133,30 +139,6 @@ function bg_location_Callback(hObject, eventdata, handles)
     bg = imresize(bg,[600,800]);
     assignin('base','bg',bg);
         
-% --- Executes on selection change in Left_Image.
-function Left_Image_Callback(hObject, ~, handles)
-    % Get cell containing values from string {1,2}
-    contents = cellstr(get(hObject,'String'));
-    % Read which is the chosen value from cell 
-    left_choice = contents(get(hObject,'Value'));
-    % Pin value on base workspace
-    assignin('base','L',str2double(left_choice));
-    % if left is 2, then right can only be 3
-    if evalin('base','L')==2
-        assignin('base','R',3);
-        set(handles.Right_Image,'enable','off');
-    else
-        set(handles.Right_Image,'enable','on');
-    end
-
-% --- Executes on selection change in Right_Image.
-function Right_Image_Callback(hObject, ~, handles)
-    % Get cell containing values from string {2,3}
-    contents = cellstr(get(hObject,'String'));
-    % Read which is the chosen value from cell 
-    right_choice = contents(get(hObject,'Value'));
-    % Pin value on base workspace
-    assignin('base','R',str2double(right_choice));
     
 % -- Executes on selection change in Start_Point.
 function Start_Point_Callback(~, ~, handles)
@@ -175,39 +157,78 @@ function Succeed_Frames_Callback(~, ~, handles)
 % --------------- Choose Processing Mode ----------------------- %
 % --- Executes on button press in Start_btn.
 function Start_btn_Callback(hObject, eventdata, handles)
+    set(handles.output_val, 'string', 'Starting Program');
     % Start process by considering stop button as not pressed
     set(handles.Stop_btn, 'userdata', 0);
     % render all button for parameter unchangeable
     set([handles.Main_Working_Folder,handles.bg_location,handles.Save_btn, handles.Portal, handles.E_L, handles.Szene],'enable','off');
-    set([handles.Left_Image, handles.Right_Image, handles.Start_Point, handles.is_save, handles.Succeed_Frames],'enable','off');
+    set([handles.Left_Right, handles.Start_Point, handles.is_save, handles.Succeed_Frames],'enable','off');
     set([handles.Foreground,handles.Background,handles.Substitute,handles.Overlay, handles.Loop_check],'enable','off');
+    try
+        Portal = evalin('base','Portal');
+        E_L = evalin('base','E_L');
+        Szene = evalin('base','Szene');
+    catch
+        Portal = "P1";
+        E_L = 'E';
+        Szene = 'S1';
+    end
     if ispc
-        used_Data = strcat(evalin('base','folderpath'),'\',evalin('base','Portal'),evalin('base','E_L'),'_',evalin('base','Szene'));
+        used_Data = strcat(evalin('base','folderpath'),'\',Portal,E_L,'_',Szene);
     else
         if ismac||isunix
-            used_Data = strcat(evalin('base','folderpath'),'/',evalin('base','Portal'),evalin('base','E_L'),'_',evalin('base','Szene'));
+            used_Data = strcat(evalin('base','folderpath'),'/',Portal,E_L,'_',Szene);
         else
             error("System not supported!\n");
         end
     end
     % Define src variable by combining folder path with chosen portal,
     % entry method, and scene
-    assignin('base','src',convertStringsToChars(used_Data));
     set(handles.Used_Data_Points, 'string', used_Data);
-    % get pinned value StartPoint from base workspace
-    dest = evalin('base','dest');
-    L = evalin('base','L');
-    R = evalin('base','R');
-    N = evalin('base','N');
+    % Define required parameters
+    src = convertStringsToChars(used_Data);
+    bg = evalin('base','bg');
+    % get optional value from base workspace
+    try
+        N = evalin('base','N');
+    catch
+        N = 4;
+    end
     if N<4
         N=4;
     end
-    mode = evalin('base','mode');
-    start = evalin('base','start');
-    src = evalin('base','src');
-    store = evalin('base','store');
-    bg = evalin('base','bg');
-    Loop_check = evalin('base','Loop_check');
+    try
+        start = evalin('base','start');
+    catch
+        start = 20;
+    end
+    try
+        L = evalin('base','L');
+        R = evalin('base','R');
+    catch
+        L = 1;
+        R = 2;
+    end
+    try
+        dest = evalin('base','dest');
+    catch
+        dest = 0;
+    end
+    try
+        render_mode = evalin('base','render_mode');
+    catch
+        render_mode = 'foreground';
+    end
+    try
+        store = evalin('base','store');
+    catch
+        store = 0;
+    end
+    try 
+        Loop_check = evalin('base','Loop_check');
+    catch
+        Loop_check = 0;
+    end
     %index for movie, and loop
     i = 1;
     loop = 0;
@@ -217,8 +238,11 @@ function Start_btn_Callback(hObject, eventdata, handles)
     movie_flag = 0; 
     % From this part start processing using challenge.m algorithm
     % Image Reading part
+    tic
     ir = ImageReader(src, L, R, start, N);
+    set(handles.Loop_status, 'string', 'Loop in progress, press stop to end');
     while loop ~= 1
+        set(handles.output_val, 'string', i);
     % Get next image tensors
         [left,right,loop]=next(ir);
     % Generate binary mask
@@ -226,12 +250,12 @@ function Start_btn_Callback(hObject, eventdata, handles)
             mask=segmentation(left,right);
             frame=left(:,:,7:9);          
             % Render new frame
-            result = im2uint8(render(frame,mask,bg,mode)); %double not work due to precision error, memory error and so on, so convert it to uint8
+            result = im2uint8(render(frame,mask,bg,render_mode)); %double not work due to precision error, memory error and so on, so convert it to uint8
             movie{i}=result;  %save current processed image to movie cell array
             i=i+1;
         else
             frame=left(:,:,1:3);
-            result = im2uint8(render(frame,mask,bg,mode));
+            result = im2uint8(render(frame,mask,bg,render_mode));
             movie{i}=result;  % movie is a cell
         end
         drawnow
@@ -245,13 +269,16 @@ function Start_btn_Callback(hObject, eventdata, handles)
         if i==5000 %if movie is full, new image will overwrite from beginning  
             i=1;
             movie_flag=1;%if GUI set loop mode, movie will be full filled and totally exported.
-        end 
+        end
     end
+    set(handles.Loop_status, 'string', 'Loop ended');
+    set(handles.tictoc, 'string', toc);
+    set(handles.output_val, 'string', 'Saving Program');
  %% Write Movie to Disk
     if store
         VideoObj = VideoWriter(dest,'Motion JPEG AVI');  % VideoWriter is an object to write files, dst is file name, 'Motion JPEG AVI' is file type
         % create the video writer with 5 fps, the default value is 30
-        VideoObj.FrameRate = 5;
+        VideoObj.FrameRate = 100;
         % open the video writer
         open(VideoObj);
         %clip movie, delete blank frames
@@ -269,6 +296,7 @@ function Start_btn_Callback(hObject, eventdata, handles)
         % close the writer object
         close(VideoObj);
         % obj = VideoReader('E:\Download\CV_2020_G35-master\CV_2020_G35-master\output.avi');%path of video
+        set(handles.output_val, 'string', 'Showing Video');
         obj = VideoReader(dest);
         numFrames = obj.NumFrames;% number of frames
         for i = 1 : numFrames	
@@ -277,6 +305,7 @@ function Start_btn_Callback(hObject, eventdata, handles)
             imshow(frame);%show frame
         end
     else
+        set(handles.output_val, 'string', 'Showing Video');
         if movie_flag == 0 %if movie is full, export all as video, if not, delete blank part 
             movie = movie(1:i-1);
         else 
@@ -291,7 +320,7 @@ function Start_btn_Callback(hObject, eventdata, handles)
     end
     % turn all button on again
     set([handles.Main_Working_Folder,handles.bg_location,handles.Save_btn, handles.Portal, handles.E_L, handles.Szene],'enable','on');
-    set([handles.Left_Image, handles.Right_Image, handles.Start_Point, handles.is_save, handles.Succeed_Frames],'enable','on');
+    set([handles.Left_Right, handles.Start_Point, handles.is_save, handles.Succeed_Frames],'enable','on');
     set([handles.Foreground,handles.Background,handles.Substitute,handles.Overlay, handles.Loop_check],'enable','on');
     % if data is saved
     if store
@@ -300,6 +329,7 @@ function Start_btn_Callback(hObject, eventdata, handles)
         save_message = sprintf('Data not saved');
     end
     set(handles.Save_status, 'string', save_message);
+    set(handles.output_val, 'string', 'Program is finished');
 
 % --- Executes on button press in Stop_btn.
 function Stop_btn_Callback(~, ~, handles)
@@ -336,12 +366,29 @@ function Save_btn_Callback(~, ~, ~)
         error("System not supported!\n");
     end
     assignin('base','dest',dest);
-    
+
+% --- Executes on selection change in Left_Right.
+function Left_Right_Callback(hObject, eventdata, handles)
+    % Get cell containing values from string {2,3}
+    contents = cellstr(get(hObject,'String'));
+    % Read which is the chosen value from cell 
+    choice = contents(get(hObject,'Value'));
+    % Pin value on base workspace
+    if strcmp(string(choice),"Left Camera 1 Right Camera 2")
+        assignin('base','L',1);
+        assignin('base','R',2);
+    elseif strcmp(string(choice),"Left Camera 1 Right Camera 3")
+        assignin('base','L',1);
+        assignin('base','R',3);
+    else
+        assignin('base','L',2);
+        assignin('base','R',3);
+    end
 
 % --------------- Choose Rendering Mode ----------------------- %
 % --- Executes when selected object is changed in Rendering_Mode.
 function Rendering_Mode_SelectionChangedFcn(~, eventdata, handles)
-    % uppdate value for render_mode for config.m later
+    % update value for render_mode for config.m later
     switch(get(eventdata.NewValue,'Tag'))
         case 'Foreground'
             render_mode = get(handles.Foreground,'string');
@@ -353,4 +400,4 @@ function Rendering_Mode_SelectionChangedFcn(~, eventdata, handles)
             render_mode = get(handles.Substitute,'string');
     end
     % Pin value on base workspace
-    assignin('base','mode',render_mode);
+    assignin('base','render_mode',render_mode);

@@ -45,7 +45,7 @@ toc %get runtime
 if store
     VideoObj = VideoWriter(dst,'Motion JPEG AVI');  % VideoWriter is an object to write files, dst is file name, 'Motion JPEG AVI' is file type
     % create the video writer with 5 fps, the default value is 30
-    VideoObj.FrameRate = 5;
+    VideoObj.FrameRate = 30;
     
     % open the video writer
     open(VideoObj);

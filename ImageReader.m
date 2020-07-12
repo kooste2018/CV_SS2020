@@ -13,7 +13,7 @@ classdef ImageReader
         function ir = ImageReader(src, L, R, varargin)  % function with same name, to get parameters and update properties   
             if (L==R)  %check if the same folder
                 error('L and R must be different!\n');
-            else
+            end
             % Input Parser
             p=inputParser;
             p.addRequired('src');  %these 3 are required parameter 
@@ -31,7 +31,7 @@ classdef ImageReader
                 ir.l = strcat(src,'\',src(end-5:end),'_C',string(p.Results.L));  % Concatenate strings horizontally
                 ir.r = strcat(src,'\',src(end-5:end),'_C',string(p.Results.R));
             else
-                if ismac||isunix  %if it's mac or unix, they have same path syntax 
+                if ismac||isunix  %if it's mac or unix, they have same path syntax
                     ir.l = strcat(src,'/',src(end-5:end),'_C',string(p.Results.L)); 
                     ir.r = strcat(src,'/',src(end-5:end),'_C',string(p.Results.R));
                 else
@@ -41,9 +41,9 @@ classdef ImageReader
             ir.start = p.Results.start; %index of starting image
             ir.start=max(ir.start,1); %0 means index 1 by me, so set start min 1
             ir.N = p.Results.N; %number of following images
-            ir.allimage_left=dir(fullfile(ir.l,'*.jpg')); %read all images for next()
-            ir.allimage_right=dir(fullfile(ir.r,'*.jpg'));
-            end
+            %read all images for next()
+            ir.allimage_left=dir(fullfile(ir.l,'*.jpg'));
+            ir.allimage_right=dir(fullfile(ir.r,'*.jpg'));    
         end
 
 
@@ -56,8 +56,8 @@ classdef ImageReader
             right = left;  %initialize left and right for speeding up
             if index+ir.N<=numel(ir.allimage_left)  %if not reach the end. numel:count the number of elements
                 for i=1:ir.N+1
-                    left(:,:,3*i-2:3*i)=im2double(imread(strcat(ir.l,'/',ir.allimage_left(index).name)));
-                    right(:,:,3*i-2:3*i)=im2double(imread(strcat(ir.r,'/',ir.allimage_right(index).name)));
+                    left(:,:,3*i-2:3*i)=im2double(imread(strcat(ir.allimage_left(index).folder,'/',ir.allimage_left(index).name)));
+                    right(:,:,3*i-2:3*i)=im2double(imread(strcat(ir.allimage_right(index).folder,'/',ir.allimage_right(index).name)));
                     index=index+1; %update index for next image
                 end
             else  %reach the end, set loop, and set start to begin
@@ -65,8 +65,8 @@ classdef ImageReader
                 left = zeros(600,800,3*num_rest);  %redefine dimension because there are less than N+1 images left
                 right = left;
                 for i=1:num_rest %pack all rest image together and pass it to left and right
-                    left(:,:,3*i-2:3*i)=im2double(imread(strcat(ir.l,'/',ir.allimage_left(index).name)));
-                    right(:,:,3*i-2:3*i)=im2double(imread(strcat(ir.r,'/',ir.allimage_right(index).name)));
+                    left(:,:,3*i-2:3*i)=im2double(imread(strcat(ir.allimage_left(index).folder,'/',ir.allimage_left(index).name)));
+                    right(:,:,3*i-2:3*i)=im2double(imread(strcat(ir.allimage_right(index).folder,'/',ir.allimage_right(index).name)));
                     index=index+1;%update index
                 end
                 ir.loop=1;  %set loop 1 to escape the while loop in challenge

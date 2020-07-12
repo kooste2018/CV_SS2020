@@ -1,4 +1,4 @@
-function [result] = render(frame,mask,bg,mode)
+function [result] = render(frame,mask,bg,render_mode)
   % Add function description here
   %frame: current image to be used
   %mask: mask for sepearate face and background
@@ -12,7 +12,7 @@ function [result] = render(frame,mask,bg,mode)
   bg_here(:,:,1:3)=frame(:,:,1:3).*(abs(mask-1)); %apply mask to get background 
   bg_virtual(:,:,1:3)=bg(:,:,1:3).*(abs(mask-1)); %get virtual background from image
   result=zeros(size(frame)); %predefine result 
-  switch mode
+  switch render_mode
       case 'foreground'
           result=fg_here; %the rest is already 0, i.e. black
       case 'background'
