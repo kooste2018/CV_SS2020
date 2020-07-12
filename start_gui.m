@@ -253,10 +253,6 @@ function Start_btn_Callback(hObject, eventdata, handles)
             result = im2uint8(render(frame,mask,bg,render_mode)); %double not work due to precision error, memory error and so on, so convert it to uint8
             movie{i}=result;  %save current processed image to movie cell array
             i=i+1;
-        else
-            frame=left(:,:,1:3);
-            result = im2uint8(render(frame,mask,bg,render_mode));
-            movie{i}=result;  % movie is a cell
         end
         drawnow
         stop_btn = get(handles.Stop_btn, 'userdata');
