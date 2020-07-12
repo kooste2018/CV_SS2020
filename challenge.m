@@ -31,7 +31,7 @@ elapsed_time =toc; %get runtime
 
 %% Write Movie to Disk
 if store
-    VideoObj = VideoWriter(dst,'Uncompressed AVI');  % VideoWriter is an object to write files, dst is file name, 'Motion JPEG AVI' is file type
+    VideoObj = VideoWriter(dst,'Motion JPEG AVI');  % VideoWriter is an object to write files, dst is file name, 'Motion JPEG AVI' is file type
     % create the video writer with 5 fps, the default value is 30
     VideoObj.FrameRate = 15;
     
