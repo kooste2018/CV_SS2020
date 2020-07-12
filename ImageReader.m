@@ -60,6 +60,7 @@ classdef ImageReader
                     right(:,:,3*i-2:3*i)=im2double(imread(strcat(ir.allimage_right(index).folder,'/',ir.allimage_right(index).name)));
                     index=index+1; %update index for next image
                 end
+                index=index-ir.N;%reset index for next image
             else  %reach the end, set loop, and set start to begin
                 num_rest=numel(ir.allimage_left)-index+1;
                 left = zeros(600,800,3*num_rest);  %redefine dimension because there are less than N+1 images left
