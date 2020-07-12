@@ -5,7 +5,7 @@ close all
 %% Start timer here
 tic
 %% Generate Movie
-%load default parameters, if gui has passed parameters already, this should not be executed.
+%load default parameters, if gui has passed no parameters already, this should not be executed.
 config;
 
 while loop ~= 1
